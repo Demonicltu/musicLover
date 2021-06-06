@@ -1,0 +1,55 @@
+= Music Lover home task REST API documentation
+:toc: left
+:toclevels: 4
+:sectids:
+:sectnums:
+:sectanchors:
+:sectlinks:
+:revnumber: {version}
+:revdate: {timestamp}
+
+== Endpoints
+
+=== Home
+==== Api is up!
+===== Request
+====== Request Headers
+include::{snippets}/home/request-headers.adoc[]
+====== Example Request
+include::{snippets}/home/http-request.adoc[]
+===== Response
+====== Example Response
+include::{snippets}/home/http-response.adoc[]
+
+=== Authentication
+==== Login
+===== Request
+====== Request Headers
+include::{snippets}/loginUser/request-headers.adoc[]
+====== Request Fields
+include::{snippets}/loginUser/request-fields.adoc[]
+====== Example Request
+include::{snippets}/loginUser/http-request.adoc[]
+===== Response
+====== Response Fields
+include::{snippets}/loginUser/response-fields.adoc[]
+====== Example Response
+include::{snippets}/loginUser/http-response.adoc[]
+
+==== Register
+===== Request
+====== Request Headers
+include::{snippets}/registerUser/request-headers.adoc[]
+====== Request Fields
+include::{snippets}/registerUser/request-fields.adoc[]
+====== Example Request
+include::{snippets}/registerUser/http-request.adoc[]
+===== Response
+====== Response Fields
+include::{snippets}/registerUser/response-fields.adoc[]
+====== Example Response
+include::{snippets}/registerUser/http-response.adoc[]
+
+=== Artists
+
+
