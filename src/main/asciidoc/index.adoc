@@ -22,7 +22,7 @@ include::{snippets}/home/http-request.adoc[]
 include::{snippets}/home/http-response.adoc[]
 
 === Authentication
-==== Login
+==== Login user
 ===== Request
 ====== Request Headers
 include::{snippets}/loginUser/request-headers.adoc[]
@@ -36,7 +36,7 @@ include::{snippets}/loginUser/response-fields.adoc[]
 ====== Example Response
 include::{snippets}/loginUser/http-response.adoc[]
 
-==== Register
+==== Register user
 ===== Request
 ====== Request Headers
 include::{snippets}/registerUser/request-headers.adoc[]
@@ -52,4 +52,44 @@ include::{snippets}/registerUser/http-response.adoc[]
 
 === Artists
 
+==== Search artists
+===== Request
+====== Request Headers
+include::{snippets}/getArtists/request-headers.adoc[]
+====== Request Parameters
+include::{snippets}/getArtists/request-parameters.adoc[]
+====== Example Request
+include::{snippets}/getArtists/http-request.adoc[]
+===== Response
+====== Response Fields
+include::{snippets}/getArtists/response-fields.adoc[]
+====== Example Response
+include::{snippets}/getArtists/http-response.adoc[]
 
+==== Save artist
+===== Request
+====== Request Headers
+include::{snippets}/saveArtist/request-headers.adoc[]
+====== Request Fields
+include::{snippets}/saveArtist/request-fields.adoc[]
+====== Example Request
+include::{snippets}/saveArtist/http-request.adoc[]
+===== Response
+====== Response Fields
+include::{snippets}/saveArtist/response-fields.adoc[]
+====== Example Response
+include::{snippets}/saveArtist/http-response.adoc[]
+
+==== Get artist albums
+===== Request
+====== Request Headers
+include::{snippets}/getAlbums/request-headers.adoc[]
+====== Request Parameters
+include::{snippets}/getAlbums/request-parameters.adoc[]
+====== Example Request
+include::{snippets}/getAlbums/http-request.adoc[]
+===== Response
+====== Response Fields
+include::{snippets}/getAlbums/response-fields.adoc[]
+====== Example Response
+include::{snippets}/getAlbums/http-response.adoc[]

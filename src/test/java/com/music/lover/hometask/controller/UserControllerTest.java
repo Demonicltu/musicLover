@@ -1,7 +1,7 @@
 package com.music.lover.hometask.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.music.lover.hometask.BaseTest;
 import com.music.lover.hometask.dto.UserLoginDTO;
 import com.music.lover.hometask.dto.UserLoginResponseDTO;
 import com.music.lover.hometask.dto.UserRegistrationDTO;
@@ -14,14 +14,10 @@ import com.music.lover.hometask.exception.error.RequestError;
 import com.music.lover.hometask.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -43,16 +39,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserController.class)
-@AutoConfigureRestDocs(outputDir = "target/generated-snippets")
-@AutoConfigureMockMvc
-class UserControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper mapper;
+@SpringBootTest
+class UserControllerTest extends BaseTest {
 
     @MockBean
     private UserService userService;
@@ -70,7 +58,7 @@ class UserControllerTest {
                         )
                 );
 
-        MvcResult mvcResult = mockMvc
+        MvcResult mvcResult = getMockMvc()
                 .perform(
                         MockMvcRequestBuilders.post("/v1/users/register")
                                 .with(httpBasic("user", "pass"))
@@ -121,7 +109,7 @@ class UserControllerTest {
         when(userService.registerUser(any()))
                 .thenThrow(new PasswordsDontMatchException());
 
-        MvcResult mvcResult = mockMvc
+        MvcResult mvcResult = getMockMvc()
                 .perform(
                         MockMvcRequestBuilders.post("/v1/users/register")
                                 .with(httpBasic("user", "pass"))
@@ -144,7 +132,7 @@ class UserControllerTest {
         when(userService.registerUser(any()))
                 .thenThrow(new UserAlreadyExistsException());
 
-        MvcResult mvcResult = mockMvc
+        MvcResult mvcResult = getMockMvc()
                 .perform(
                         MockMvcRequestBuilders.post("/v1/users/register")
                                 .with(httpBasic("user", "pass"))
@@ -170,7 +158,7 @@ class UserControllerTest {
                         )
                 );
 
-        MvcResult mvcResult = mockMvc
+        MvcResult mvcResult = getMockMvc()
                 .perform(
                         MockMvcRequestBuilders.post("/v1/users/login")
                                 .with(httpBasic("user", "pass"))
@@ -213,7 +201,7 @@ class UserControllerTest {
         when(userService.loginUser(any()))
                 .thenThrow(new UserNotFoundException());
 
-        MvcResult mvcResult = mockMvc
+        MvcResult mvcResult = getMockMvc()
                 .perform(
                         MockMvcRequestBuilders.post("/v1/users/login")
                                 .with(httpBasic("user", "pass"))

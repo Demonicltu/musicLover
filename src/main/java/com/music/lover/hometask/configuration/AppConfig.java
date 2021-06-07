@@ -24,7 +24,7 @@ public class AppConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new UserInterceptor(userService))
                 .addPathPatterns("/v1/**")
-                .excludePathPatterns("/v1/users**");
+                .excludePathPatterns("/v1/users/**");
     }
 
 }

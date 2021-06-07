@@ -11,9 +11,10 @@ import com.music.lover.hometask.exception.UserNotFoundException;
 import com.music.lover.hometask.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -23,18 +24,14 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 
-@WebMvcTest(UserService.class)
-public class UserServiceTest {
+@ExtendWith(MockitoExtension.class)
+class UserServiceImplTest {
 
-    private final UserService userService;
+    @InjectMocks
+    private UserServiceImpl userService;
 
-    @MockBean
+    @Mock
     private UserRepository userRepository;
-
-    @Autowired
-    public UserServiceTest(UserService userService) {
-        this.userService = userService;
-    }
 
     @Test
     void testRegisterUser() throws UserAlreadyExistsException, PasswordsDontMatchException {

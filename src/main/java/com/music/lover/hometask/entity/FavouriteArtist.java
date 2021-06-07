@@ -15,7 +15,9 @@ public class FavouriteArtist {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String artist;
+    private Long amgArtistId;
+
+    private String artistName;
 
     @ManyToOne
     private User user;
@@ -24,8 +26,9 @@ public class FavouriteArtist {
         //Empty for auto init
     }
 
-    public FavouriteArtist(String artist, User user) {
-        this.artist = artist;
+    public FavouriteArtist(Long amgArtistId, String artistName, User user) {
+        this.amgArtistId = amgArtistId;
+        this.artistName = artistName;
         this.user = user;
     }
 
@@ -37,12 +40,20 @@ public class FavouriteArtist {
         this.id = id;
     }
 
-    public String getArtist() {
-        return artist;
+    public Long getAmgArtistId() {
+        return amgArtistId;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
+    public void setAmgArtistId(Long amgArtistId) {
+        this.amgArtistId = amgArtistId;
+    }
+
+    public String getArtistName() {
+        return artistName;
+    }
+
+    public void setArtistName(String artistName) {
+        this.artistName = artistName;
     }
 
     public User getUser() {

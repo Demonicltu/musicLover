@@ -11,7 +11,11 @@ import com.music.lover.hometask.exception.UserNotFoundException;
 import com.music.lover.hometask.exception.error.ApplicationError;
 import com.music.lover.hometask.service.UserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.Valid;
 
