@@ -1,163 +1,167 @@
 package com.music.lover.hometask.service;
 
 
-import com.music.lover.hometask.dto.AlbumDTO;
-import com.music.lover.hometask.dto.ArtistDTO;
+import com.music.lover.hometask.data.ArtistMock;
+import com.music.lover.hometask.dto.ArtistResponse;
 import com.music.lover.hometask.dto.NewArtistDTO;
+import com.music.lover.hometask.entity.Artist;
 import com.music.lover.hometask.entity.User;
+import com.music.lover.hometask.exception.ArtistAlreadyExistsException;
 import com.music.lover.hometask.exception.ServiceException;
 import com.music.lover.hometask.exception.UriBuildException;
-import com.music.lover.hometask.integration.ItunesService;
-import com.music.lover.hometask.integration.response.AlbumInformation;
 import com.music.lover.hometask.integration.response.ArtistInformation;
-import com.music.lover.hometask.repository.FavouriteArtistRepository;
+import com.music.lover.hometask.repository.ArtistRepository;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.anyList;
-import static org.mockito.Mockito.anyInt;
 
 @ExtendWith(MockitoExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ArtistServiceImplTest {
 
-    @InjectMocks
     private ArtistServiceImpl artistService;
 
     @Mock
-    private FavouriteArtistRepository favouriteArtistRepository;
+    private ArtistRepository artistRepository;
 
     @Mock
     private ItunesService itunesService;
 
-    @Test
-    void testGetArtists() throws Exception {
-        String artist = "testArtist";
+    @BeforeEach
+    public void setup() {
+        artistService = new ArtistServiceImpl(
+                artistRepository,
+                itunesService
+        );
+    }
 
-        ArtistInformation artistInformation = new ArtistInformation();
-        artistInformation.setArtistName("testArtist");
-        artistInformation.setAmgArtistId(1L);
+    @Test
+    void testGetArtist() throws Exception {
+        ArtistInformation artistInformation = ArtistMock.getArtistInformation();
 
         when(itunesService.searchArtists(any()))
                 .thenAnswer(invocation -> Collections.singletonList(artistInformation));
 
-        List<ArtistDTO> artistDTOList = artistService.getArtists(artist);
+        List<ArtistResponse> artistResponseList = artistService.getArtist(artistInformation.getArtistName());
 
         verify(itunesService, times(1))
                 .searchArtists(any());
 
-        Assertions.assertFalse(artistDTOList.isEmpty());
-        Assertions.assertEquals(artistInformation.getAmgArtistId(), artistDTOList.get(0).getAmgArtistId());
-        Assertions.assertEquals(artistInformation.getArtistName(), artistDTOList.get(0).getArtistName());
+        Assertions.assertFalse(artistResponseList.isEmpty());
+        Assertions.assertEquals(artistInformation.getAmgArtistId(), artistResponseList.get(0).getAmgArtistId());
+        Assertions.assertEquals(artistInformation.getArtistName(), artistResponseList.get(0).getArtistName());
     }
 
     @Test
-    void testGetArtistsServiceException() throws Exception {
-        String artist = "testArtist";
-
-        when(itunesService.searchArtists(any()))
-                .thenThrow(new ServiceException("TestException"));
-
-        Assertions.assertThrows(ServiceException.class, () -> artistService.getArtists(artist));
-
-        verify(itunesService, times(1))
-                .searchArtists(any());
+    void testGetArtistServiceException() throws Exception {
+        testGetArtistException(new ServiceException("TestException"), ServiceException.class);
     }
 
     @Test
-    void testGetArtistsUriBuildException() throws Exception {
-        String artist = "testArtist";
-
-        when(itunesService.searchArtists(any()))
-                .thenThrow(new UriBuildException(new Exception("TestException")));
-
-        Assertions.assertThrows(UriBuildException.class, () -> artistService.getArtists(artist));
-
-        verify(itunesService, times(1))
-                .searchArtists(any());
+    void testGetArtistUriBuildException() throws Exception {
+        testGetArtistException(new UriBuildException(new Exception("TestException")), UriBuildException.class);
     }
 
     @Test
-    void testSaveFavouriteArtist() {
-        NewArtistDTO newArtistDTO = new NewArtistDTO(
-                1L,
-                "testArtist"
-        );
+    void testSaveArtist() throws Exception {
+        NewArtistDTO newArtistDTO = ArtistMock.getNewArtistDTO();
 
-        when(favouriteArtistRepository.save(any()))
+        when(artistRepository.existsByAmgArtistIdAndArtistUsersContaining(any(), any()))
+                .thenAnswer(invocation -> false);
+
+        when(artistRepository.save(any()))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        ArtistDTO artistDTO = artistService.saveFavouriteArtist(newArtistDTO, new User());
+        ArtistResponse artistResponse = artistService.saveArtist(newArtistDTO, new User());
 
-        verify(favouriteArtistRepository, times(1))
+        verify(artistRepository, times(1))
                 .save(any());
 
-        Assertions.assertNotNull(artistDTO);
-        Assertions.assertEquals(newArtistDTO.getAmgArtistId(), artistDTO.getAmgArtistId());
-        Assertions.assertEquals(newArtistDTO.getArtistName(), artistDTO.getArtistName());
+        verify(artistRepository, times(1))
+                .existsByAmgArtistIdAndArtistUsersContaining(any(), any());
+
+        Assertions.assertNotNull(artistResponse);
+        Assertions.assertEquals(newArtistDTO.getAmgArtistId(), artistResponse.getAmgArtistId());
+        Assertions.assertEquals(newArtistDTO.getArtistName(), artistResponse.getArtistName());
     }
 
     @Test
-    void testGetAlbums() throws Exception {
-        AlbumInformation albumInformation = new AlbumInformation();
-        albumInformation.setAmgArtistId(1L);
-        albumInformation.setArtistName("testArtist");
-        albumInformation.setCollectionPrice(0.15f);
-        albumInformation.setCurrency("USD");
-        albumInformation.setTrackCount(15);
-        albumInformation.setCopyright("testCopyright");
-        albumInformation.setCountry("testCountry");
-        albumInformation.setPrimaryGenreName("testGenre");
-        albumInformation.setReleaseDate("2012-01-01T08:00:00Z");
+    void testSaveArtistArtistAlreadyExistsException() {
+        when(artistRepository.existsByAmgArtistIdAndArtistUsersContaining(any(), any()))
+                .thenAnswer(invocation -> true);
 
-        when(itunesService.lookupAlbums(anyList(), anyInt()))
-                .thenAnswer(invocation -> Collections.singletonList(albumInformation));
+        Assertions.assertThrows(ArtistAlreadyExistsException.class, () -> artistService.saveArtist(ArtistMock.getNewArtistDTO(), new User()));
 
-        List<AlbumDTO> albumDTOList = artistService.getAlbums(Collections.singletonList(1L), 5);
+        verify(artistRepository, times(1))
+                .existsByAmgArtistIdAndArtistUsersContaining(any(), any());
 
-        verify(itunesService, times(1))
-                .lookupAlbums(anyList(), anyInt());
-
-        Assertions.assertFalse(albumDTOList.isEmpty());
-        Assertions.assertEquals(albumInformation.getArtistName(), albumDTOList.get(0).getArtistName());
-        Assertions.assertEquals(albumInformation.getCollectionPrice(), albumDTOList.get(0).getCollectionPrice());
-        Assertions.assertEquals(albumInformation.getCurrency(), albumDTOList.get(0).getCurrency());
-        Assertions.assertEquals(albumInformation.getTrackCount(), albumDTOList.get(0).getTrackCount());
-        Assertions.assertEquals(albumInformation.getCopyright(), albumDTOList.get(0).getCopyright());
-        Assertions.assertEquals(albumInformation.getCountry(), albumDTOList.get(0).getCountry());
-        Assertions.assertEquals(albumInformation.getPrimaryGenreName(), albumDTOList.get(0).getPrimaryGenreName());
+        verify(artistRepository, times(0))
+                .save(any());
     }
 
     @Test
-    void testGetAlbumsServiceException() throws Exception {
-        when(itunesService.lookupAlbums(anyList(), anyInt()))
-                .thenThrow(new ServiceException("TestException"));
+    void testSaveOrGetArtist() {
+        when(artistRepository.save(any()))
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
-        Assertions.assertThrows(ServiceException.class, () -> artistService.getAlbums(Collections.singletonList(1L), 5));
+        when(artistRepository.findByAmgArtistId(any()))
+                .thenAnswer(invocation -> Optional.empty());
 
-        verify(itunesService, times(1))
-                .lookupAlbums(anyList(), anyInt());
+        Artist artist = artistService.saveOrGetArtist(1L, "testArtist");
+
+        verify(artistRepository, times(1))
+                .save(any());
+
+        verify(artistRepository, times(1))
+                .findByAmgArtistId(any());
+
+        Assertions.assertNotNull(artist);
+        Assertions.assertEquals(1L, artist.getAmgArtistId());
+        Assertions.assertEquals("testArtist", artist.getArtistName());
     }
 
     @Test
-    void testGetAlbumsUriBuildException() throws Exception {
-        when(itunesService.lookupAlbums(anyList(), anyInt()))
-                .thenThrow(new UriBuildException(new Exception("TestException")));
+    void testSaveOrGetArtistFoundInDb() {
+        Artist inputArtist = ArtistMock.getArtist();
+        when(artistRepository.findByAmgArtistId(any()))
+                .thenAnswer(invocation -> Optional.of(inputArtist));
 
-        Assertions.assertThrows(UriBuildException.class, () -> artistService.getAlbums(Collections.singletonList(1L), 5));
+        Artist artist = artistService.saveOrGetArtist(inputArtist.getAmgArtistId(), inputArtist.getArtistName());
+
+        verify(artistRepository, times(0))
+                .save(any());
+
+        verify(artistRepository, times(1))
+                .findByAmgArtistId(any());
+
+        Assertions.assertNotNull(artist);
+        Assertions.assertEquals(inputArtist.getAmgArtistId(), artist.getAmgArtistId());
+        Assertions.assertEquals(inputArtist.getArtistName(), artist.getArtistName());
+    }
+
+    private <T extends Throwable> void testGetArtistException(Throwable exception, Class<T> exceptionClass) throws Exception {
+        String artist = "testArtist";
+
+        when(itunesService.searchArtists(any()))
+                .thenThrow(exception);
+
+        Assertions.assertThrows(exceptionClass, () -> artistService.getArtist(artist));
 
         verify(itunesService, times(1))
-                .lookupAlbums(anyList(), anyInt());
+                .searchArtists(any());
     }
 
 }

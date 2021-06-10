@@ -52,19 +52,19 @@ include::{snippets}/registerUser/http-response.adoc[]
 
 === Artists
 
-==== Search artists
+==== Search artist
 ===== Request
 ====== Request Headers
-include::{snippets}/getArtists/request-headers.adoc[]
+include::{snippets}/getArtist/request-headers.adoc[]
 ====== Request Parameters
-include::{snippets}/getArtists/request-parameters.adoc[]
+include::{snippets}/getArtist/request-parameters.adoc[]
 ====== Example Request
-include::{snippets}/getArtists/http-request.adoc[]
+include::{snippets}/getArtist/http-request.adoc[]
 ===== Response
 ====== Response Fields
-include::{snippets}/getArtists/response-fields.adoc[]
+include::{snippets}/getArtist/response-fields.adoc[]
 ====== Example Response
-include::{snippets}/getArtists/http-response.adoc[]
+include::{snippets}/getArtist/http-response.adoc[]
 
 ==== Save artist
 ===== Request
@@ -80,12 +80,14 @@ include::{snippets}/saveArtist/response-fields.adoc[]
 ====== Example Response
 include::{snippets}/saveArtist/http-response.adoc[]
 
-==== Get artist albums
+=== Albums
+
+==== Search albums
 ===== Request
 ====== Request Headers
 include::{snippets}/getAlbums/request-headers.adoc[]
-====== Request Parameters
-include::{snippets}/getAlbums/request-parameters.adoc[]
+====== Path Parameters
+include::{snippets}/getAlbums/path-parameters.adoc[]
 ====== Example Request
 include::{snippets}/getAlbums/http-request.adoc[]
 ===== Response

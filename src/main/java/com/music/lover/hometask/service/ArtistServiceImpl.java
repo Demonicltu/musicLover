@@ -1,98 +1,75 @@
 package com.music.lover.hometask.service;
 
-import com.music.lover.hometask.dto.AlbumDTO;
-import com.music.lover.hometask.dto.ArtistDTO;
+import com.music.lover.hometask.dto.ArtistResponse;
 import com.music.lover.hometask.dto.NewArtistDTO;
-import com.music.lover.hometask.entity.FavouriteArtist;
+import com.music.lover.hometask.entity.Artist;
 import com.music.lover.hometask.entity.User;
+import com.music.lover.hometask.exception.ArtistAlreadyExistsException;
 import com.music.lover.hometask.exception.ServiceException;
 import com.music.lover.hometask.exception.UriBuildException;
-import com.music.lover.hometask.integration.ItunesService;
-import com.music.lover.hometask.integration.response.AlbumInformation;
 import com.music.lover.hometask.integration.response.ArtistInformation;
-import com.music.lover.hometask.repository.FavouriteArtistRepository;
+import com.music.lover.hometask.mapper.ArtistMapper;
+import com.music.lover.hometask.repository.ArtistRepository;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class ArtistServiceImpl implements ArtistService {
 
-    private final FavouriteArtistRepository favouriteArtistRepository;
+    private final ArtistRepository artistRepository;
 
     private final ItunesService itunesService;
 
     public ArtistServiceImpl(
-            FavouriteArtistRepository favouriteArtistRepository,
+            ArtistRepository artistRepository,
             ItunesService itunesService
     ) {
-        this.favouriteArtistRepository = favouriteArtistRepository;
+        this.artistRepository = artistRepository;
         this.itunesService = itunesService;
     }
 
     @Cacheable(value = "artistsCache")
-    public List<ArtistDTO> getArtists(String artist) throws ServiceException, UriBuildException {
+    public List<ArtistResponse> getArtist(String artist) throws ServiceException, UriBuildException {
         List<ArtistInformation> artistInformationList = itunesService.searchArtists(artist);
 
         return artistInformationList.stream()
-                .map(this::toArtistDTO)
+                .map(artistInformation -> new ArtistResponse(
+                                artistInformation.getAmgArtistId(),
+                                artistInformation.getArtistName()
+                        )
+                )
                 .collect(Collectors.toList());
     }
 
-    public ArtistDTO saveFavouriteArtist(NewArtistDTO newArtistDTO, User user) {
-        FavouriteArtist favouriteArtist = new FavouriteArtist(
+    public ArtistResponse saveArtist(NewArtistDTO newArtistDTO, User user) throws ArtistAlreadyExistsException {
+        if (artistRepository.existsByAmgArtistIdAndArtistUsersContaining(newArtistDTO.getAmgArtistId(), user)) {
+            throw new ArtistAlreadyExistsException();
+        }
+
+        Artist artist = new Artist(
                 newArtistDTO.getAmgArtistId(),
                 newArtistDTO.getArtistName(),
                 user
         );
 
-        FavouriteArtist savedFavouriteArtist = favouriteArtistRepository.save(favouriteArtist);
-
-        return toArtistDTO(savedFavouriteArtist);
+        return ArtistMapper.toArtistResponse(artistRepository.save(artist));
     }
 
-    @Cacheable(value = "artistAlbumsCache")
-    public List<AlbumDTO> getAlbums(List<Long> artistIds, int limit) throws ServiceException, UriBuildException {
-        List<AlbumInformation> albumInformationList = itunesService.lookupAlbums(artistIds, limit);
+    public Artist saveOrGetArtist(Long amgArtistId, String artistName) {
+        Optional<Artist> optionalArtist = artistRepository.findByAmgArtistId(amgArtistId);
+        if (optionalArtist.isPresent()) {
+            return optionalArtist.get();
+        }
 
-        return albumInformationList.stream()
-                .map(this::toAlbumDTO)
-                .collect(Collectors.toList());
-    }
+        Artist newArtist = new Artist();
+        newArtist.setAmgArtistId(amgArtistId);
+        newArtist.setArtistName(artistName);
 
-    private ArtistDTO toArtistDTO(ArtistInformation artistInformation) {
-        return new ArtistDTO(
-                artistInformation.getAmgArtistId(),
-                artistInformation.getArtistName()
-        );
-    }
-
-    private ArtistDTO toArtistDTO(FavouriteArtist favouriteArtist) {
-        return new ArtistDTO(
-                favouriteArtist.getAmgArtistId(),
-                favouriteArtist.getArtistName()
-        );
-    }
-
-    private AlbumDTO toAlbumDTO(AlbumInformation albumInformation) {
-        Instant instant = Instant.parse(albumInformation.getReleaseDate());
-        LocalDate localDate = LocalDate.ofInstant(instant, ZoneId.systemDefault());
-
-        return new AlbumDTO(
-                albumInformation.getArtistName(),
-                albumInformation.getCollectionPrice(),
-                albumInformation.getCurrency(),
-                albumInformation.getTrackCount(),
-                albumInformation.getCopyright(),
-                albumInformation.getCountry(),
-                albumInformation.getPrimaryGenreName(),
-                localDate
-        );
+        return artistRepository.save(newArtist);
     }
 
 }

@@ -11,11 +11,11 @@ public enum ApplicationError {
 
     SYS_ERR("System error", INTERNAL_SERVER_ERROR),
     USER_NOT_FOUND("User does not exist", NOT_FOUND),
+    ARTIST_ALREADY_SAVED("Artists was already saved", BAD_REQUEST),
     SERVICE_UNAVAILABLE("Service is not available at the moment", HttpStatus.SERVICE_UNAVAILABLE),
     PASSWORDS_DONT_MATCH("Passwords do not match", BAD_REQUEST),
     MISSING_USER_KEY("Missing user key header", UNAUTHORIZED),
-    USER_ALREADY_EXISTS("Client with this name already exists", BAD_REQUEST),
-    RESOURCE_NOT_FOUND("Resource not found", NOT_FOUND);
+    USER_ALREADY_EXISTS("Client with this name already exists", BAD_REQUEST);
 
     private final String errorName;
     private final String message;

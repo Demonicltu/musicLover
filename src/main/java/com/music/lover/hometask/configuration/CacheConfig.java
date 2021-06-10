@@ -1,6 +1,7 @@
 package com.music.lover.hometask.configuration;
 
 import com.google.common.cache.CacheBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -16,25 +17,33 @@ import java.util.concurrent.TimeUnit;
 @EnableCaching
 public class CacheConfig {
 
-    @Value("${cache.time.albums}")
-    private long cacheTimeAlbums;
+    private final long cacheTimeAlbums;
 
-    @Value("${cache.size.albums}")
-    private long cacheSizeAlbums;
+    private final long cacheSizeAlbums;
 
-    @Value("${cache.time.artists}")
-    private long cacheTimeArtists;
+    private final long cacheTimeArtists;
 
-    @Value("${cache.size.artists}")
-    private long cacheSizeArtists;
+    private final long cacheSizeArtists;
+
+    public CacheConfig(
+            @Value("${cache.time.albums}") long cacheTimeAlbums,
+            @Value("${cache.size.albums}") long cacheSizeAlbums,
+            @Value("${cache.time.artists}") long cacheTimeArtists,
+            @Value("${cache.size.artists}") long cacheSizeArtists) {
+        this.cacheTimeAlbums = cacheTimeAlbums;
+        this.cacheSizeAlbums = cacheSizeAlbums;
+        this.cacheTimeArtists = cacheTimeArtists;
+        this.cacheSizeArtists = cacheSizeArtists;
+    }
 
     @Bean
     public CacheManager cacheManager() {
         return new ConcurrentMapCacheManager() {
+            @NotNull
             @Override
-            protected Cache createConcurrentMapCache(final String name) {
+            protected Cache createConcurrentMapCache(@NotNull final String name) {
                 switch (name) {
-                    case "artistAlbumsCache":
+                    case "albumsCache":
                         return new ConcurrentMapCache(name,
                                 CacheBuilder.newBuilder()
                                         .expireAfterWrite(cacheTimeAlbums, TimeUnit.HOURS)

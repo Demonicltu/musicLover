@@ -9,6 +9,8 @@ public class AlbumInformation {
 
     private String artistName;
 
+    private String collectionName;
+
     private float collectionPrice;
 
     private String currency;
@@ -41,6 +43,14 @@ public class AlbumInformation {
 
     public void setArtistName(String artistName) {
         this.artistName = artistName;
+    }
+
+    public String getCollectionName() {
+        return collectionName;
+    }
+
+    public void setCollectionName(String collectionName) {
+        this.collectionName = collectionName;
     }
 
     public float getCollectionPrice() {

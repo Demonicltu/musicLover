@@ -1,6 +1,6 @@
 package com.music.lover.hometask.controller;
 
-import com.music.lover.hometask.BaseTest;
+import com.music.lover.hometask.BaseControllerTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-class HomeControllerTest extends BaseTest {
+class HomeControllerIntegrationTest extends BaseControllerTest {
 
     @Test
     void testHomePageEndpoint() throws Exception {

@@ -1,9 +1,9 @@
 package com.music.lover.hometask.controller;
 
-import com.music.lover.hometask.dto.UserLoginDTO;
-import com.music.lover.hometask.dto.UserLoginResponseDTO;
-import com.music.lover.hometask.dto.UserRegistrationDTO;
-import com.music.lover.hometask.dto.UserRegistrationResponseDTO;
+import com.music.lover.hometask.dto.UserLoginRequest;
+import com.music.lover.hometask.dto.UserLoginResponse;
+import com.music.lover.hometask.dto.UserRegistrationRequest;
+import com.music.lover.hometask.dto.UserRegistrationResponse;
 import com.music.lover.hometask.exception.PasswordsDontMatchException;
 import com.music.lover.hometask.exception.RequestException;
 import com.music.lover.hometask.exception.UserAlreadyExistsException;
@@ -25,17 +25,15 @@ public class UserController {
 
     private final UserService userService;
 
-    public UserController(
-            UserService userService
-    ) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserRegistrationResponseDTO registerUser(@RequestBody @Valid UserRegistrationDTO userRegistrationDTO) {
+    public UserRegistrationResponse registerUser(@RequestBody @Valid UserRegistrationRequest userRegistrationRequest) {
         try {
-            return userService.registerUser(userRegistrationDTO);
+            return userService.registerUser(userRegistrationRequest);
         } catch (PasswordsDontMatchException e) {
             throw new RequestException(ApplicationError.PASSWORDS_DONT_MATCH);
         } catch (UserAlreadyExistsException e) {
@@ -44,9 +42,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public UserLoginResponseDTO loginUser(@RequestBody @Valid UserLoginDTO userLoginDTO) {
+    public UserLoginResponse loginUser(@RequestBody @Valid UserLoginRequest userLoginRequest) {
         try {
-            return userService.loginUser(userLoginDTO);
+            return userService.loginUser(userLoginRequest);
         } catch (UserNotFoundException e) {
             throw new RequestException(ApplicationError.USER_NOT_FOUND);
         }

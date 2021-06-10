@@ -1,15 +1,18 @@
 package com.music.lover.hometask.entity;
 
 import javax.persistence.Entity;
-import javax.persistence.Table;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.ManyToOne;
+import javax.persistence.ManyToMany;
+import javax.persistence.JoinTable;
+import javax.persistence.JoinColumn;
+import javax.persistence.FetchType;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "favourite_artist")
-public class FavouriteArtist {
+public class Artist {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,17 +22,23 @@ public class FavouriteArtist {
 
     private String artistName;
 
-    @ManyToOne
-    private User user;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "USER_ARTIST",
+            joinColumns = @JoinColumn(name = "ARTIST_ID"),
+            inverseJoinColumns = @JoinColumn(name = "USER_ID"))
+    private Set<User> artistUsers;
 
-    public FavouriteArtist() {
+    public Artist() {
         //Empty for auto init
     }
 
-    public FavouriteArtist(Long amgArtistId, String artistName, User user) {
+    public Artist(Long amgArtistId, String artistName, User user) {
         this.amgArtistId = amgArtistId;
         this.artistName = artistName;
-        this.user = user;
+
+        this.artistUsers = new HashSet<>();
+        this.artistUsers.add(user);
     }
 
     public Long getId() {
@@ -56,12 +65,12 @@ public class FavouriteArtist {
         this.artistName = artistName;
     }
 
-    public User getUser() {
-        return user;
+    public Set<User> getArtistUsers() {
+        return artistUsers;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setArtistUsers(Set<User> artistUsers) {
+        this.artistUsers = artistUsers;
     }
 
 }

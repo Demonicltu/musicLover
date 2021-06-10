@@ -1,13 +1,14 @@
 package com.music.lover.hometask.service;
 
-import com.music.lover.hometask.dto.UserLoginDTO;
-import com.music.lover.hometask.dto.UserLoginResponseDTO;
-import com.music.lover.hometask.dto.UserRegistrationDTO;
-import com.music.lover.hometask.dto.UserRegistrationResponseDTO;
+import com.music.lover.hometask.dto.UserLoginRequest;
+import com.music.lover.hometask.dto.UserLoginResponse;
+import com.music.lover.hometask.dto.UserRegistrationRequest;
+import com.music.lover.hometask.dto.UserRegistrationResponse;
 import com.music.lover.hometask.entity.User;
 import com.music.lover.hometask.exception.PasswordsDontMatchException;
 import com.music.lover.hometask.exception.UserAlreadyExistsException;
 import com.music.lover.hometask.exception.UserNotFoundException;
+import com.music.lover.hometask.mapper.UserMapper;
 import com.music.lover.hometask.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
@@ -20,33 +21,23 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
-    public UserRegistrationResponseDTO registerUser(UserRegistrationDTO userRegistrationDTO)
+    public UserRegistrationResponse registerUser(UserRegistrationRequest userRegistrationRequest)
             throws UserAlreadyExistsException, PasswordsDontMatchException {
-        validateUserUniqueness(userRegistrationDTO);
+        validateUserUniqueness(userRegistrationRequest);
 
-        User user = new User(
-                userRegistrationDTO.getName(),
-                userRegistrationDTO.getUsername(),
-                userRegistrationDTO.getPassword()
-        );
-
+        User user = UserMapper.toUserRegistrationResponse(userRegistrationRequest);
         User savedUser = userRepository.save(user);
 
-        return new UserRegistrationResponseDTO(
-                savedUser.getName(),
-                savedUser.getUsername(),
-                savedUser.getPassword(),
-                savedUser.getUuid()
-        );
+        return UserMapper.toUserRegistrationResponse(savedUser);
     }
 
-    public UserLoginResponseDTO loginUser(UserLoginDTO userLoginDTO) throws UserNotFoundException {
+    public UserLoginResponse loginUser(UserLoginRequest userLoginRequest) throws UserNotFoundException {
         User authenticatedUser = userRepository.findByUsernameAndPassword(
-                userLoginDTO.getUsername(),
-                userLoginDTO.getPassword()
+                userLoginRequest.getUsername(),
+                userLoginRequest.getPassword()
         ).orElseThrow(UserNotFoundException::new);
 
-        return new UserLoginResponseDTO(authenticatedUser.getUuid());
+        return new UserLoginResponse(authenticatedUser.getUuid());
     }
 
     public User getUserByUUID(String uuid) throws UserNotFoundException {
@@ -54,7 +45,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
-    private void validateUserUniqueness(UserRegistrationDTO user)
+    private void validateUserUniqueness(UserRegistrationRequest user)
             throws UserAlreadyExistsException, PasswordsDontMatchException {
         if (!user.getPassword().equals(user.getRepeatPassword())) {
             throw new PasswordsDontMatchException();

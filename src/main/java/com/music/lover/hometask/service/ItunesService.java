@@ -1,4 +1,4 @@
-package com.music.lover.hometask.integration;
+package com.music.lover.hometask.service;
 
 import com.music.lover.hometask.exception.ServiceException;
 import com.music.lover.hometask.exception.UriBuildException;
@@ -11,6 +11,6 @@ public interface ItunesService {
 
     List<ArtistInformation> searchArtists(String term) throws ServiceException, UriBuildException;
 
-    List<AlbumInformation> lookupAlbums(List<Long> amgArtistIdList, int limit) throws ServiceException, UriBuildException;
+    List<AlbumInformation> lookupAlbums(Long amgArtistId, int limit) throws ServiceException, UriBuildException;
 
 }

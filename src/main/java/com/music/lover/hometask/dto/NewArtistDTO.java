@@ -1,17 +1,22 @@
 package com.music.lover.hometask.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 public class NewArtistDTO {
 
-    @NotNull
-    private Long amgArtistId;
+    private final Long amgArtistId;
 
-    @NotBlank
-    private String artistName;
+    private final String artistName;
 
-    public NewArtistDTO(Long amgArtistId, String artistName) {
+    @JsonCreator
+    public NewArtistDTO(
+            @NotNull @Positive Long amgArtistId,
+            @NotBlank String artistName
+    ) {
         this.amgArtistId = amgArtistId;
         this.artistName = artistName;
     }
@@ -20,16 +25,8 @@ public class NewArtistDTO {
         return amgArtistId;
     }
 
-    public void setAmgArtistId(Long amgArtistId) {
-        this.amgArtistId = amgArtistId;
-    }
-
     public String getArtistName() {
         return artistName;
-    }
-
-    public void setArtistName(String artistName) {
-        this.artistName = artistName;
     }
 
 }

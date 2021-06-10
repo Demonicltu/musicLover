@@ -1,14 +1,15 @@
 package com.music.lover.hometask.entity;
 
 import javax.persistence.Entity;
-import javax.persistence.Table;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.ManyToMany;
+import javax.persistence.FetchType;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user")
 public class User {
 
     @Id
@@ -22,6 +23,9 @@ public class User {
     private String password;
 
     private String uuid;
+
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "artistUsers")
+    private Set<Artist> userArtists;
 
     public User() {
         //Empty for auto init
@@ -72,6 +76,14 @@ public class User {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public Set<Artist> getUserArtists() {
+        return userArtists;
+    }
+
+    public void setUserArtists(Set<Artist> userArtists) {
+        this.userArtists = userArtists;
     }
 
 }

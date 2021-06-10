@@ -4,7 +4,7 @@ import com.music.lover.hometask.entity.User;
 
 public class AuthenticationInformation {
 
-    private User user;
+    private final User user;
 
     public AuthenticationInformation(User user) {
         this.user = user;
@@ -12,10 +12,6 @@ public class AuthenticationInformation {
 
     public User getUser() {
         return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
 }

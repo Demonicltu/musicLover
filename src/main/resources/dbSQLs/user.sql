@@ -14,3 +14,6 @@ create index USER_USERNAME_PASSWORD_INDEX
 
 create index USER_UUID_INDEX
     on USER (UUID);
+
+create unique index USER_NAME_UINDEX
+    on USER (NAME);
