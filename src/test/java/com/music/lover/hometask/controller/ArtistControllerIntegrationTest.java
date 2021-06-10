@@ -5,10 +5,11 @@ import com.music.lover.hometask.constant.ApiHttpHeaders;
 import com.music.lover.hometask.data.ArtistMock;
 import com.music.lover.hometask.dto.ArtistResponse;
 import com.music.lover.hometask.dto.NewArtistDTO;
+import com.music.lover.hometask.entity.User;
 import com.music.lover.hometask.integration.ItunesRestTemplate;
 import com.music.lover.hometask.integration.response.ArtistInformationResponse;
 import com.music.lover.hometask.repository.ArtistRepository;
-import com.music.lover.hometask.service.UserService;
+import com.music.lover.hometask.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -52,13 +54,16 @@ class ArtistControllerIntegrationTest extends BaseControllerTest {
     private ItunesRestTemplate itunesRestTemplate;
 
     @MockBean
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Test
     void testGetArtist() throws Exception {
         ArtistInformationResponse artistInformationResponse = ArtistMock.getArtistInformationResponse();
         when(itunesRestTemplate.executePostRequest(any(), any()))
                 .thenAnswer(invocation -> artistInformationResponse);
+
+        when(userRepository.findByUuid(any()))
+                .thenAnswer(invocation -> Optional.of(new User()));
 
         MvcResult mvcResult = getMockMvc()
                 .perform(
@@ -73,6 +78,9 @@ class ArtistControllerIntegrationTest extends BaseControllerTest {
                 .andDo(documentGetArtist())
                 .andDo(print())
                 .andReturn();
+
+        verify(userRepository, times(1))
+                .findByUuid(any());
 
         verify(itunesRestTemplate, times(1))
                 .executePostRequest(any(), any());
@@ -94,6 +102,9 @@ class ArtistControllerIntegrationTest extends BaseControllerTest {
         when(artistRepository.save(any()))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
+        when(userRepository.findByUuid(any()))
+                .thenAnswer(invocation -> Optional.of(new User()));
+
         MvcResult mvcResult = getMockMvc()
                 .perform(
                         MockMvcRequestBuilders.post("/v1/artists")
@@ -107,6 +118,9 @@ class ArtistControllerIntegrationTest extends BaseControllerTest {
                 .andDo(documentSaveArtist())
                 .andDo(print())
                 .andReturn();
+
+        verify(userRepository, times(1))
+                .findByUuid(any());
 
         verify(artistRepository, times(1))
                 .existsByAmgArtistIdAndArtistUsersContaining(any(), any());

@@ -5,12 +5,13 @@ import com.music.lover.hometask.BaseControllerTest;
 import com.music.lover.hometask.constant.ApiHttpHeaders;
 import com.music.lover.hometask.data.AlbumMock;
 import com.music.lover.hometask.dto.AlbumResponse;
+import com.music.lover.hometask.entity.User;
 import com.music.lover.hometask.integration.ItunesRestTemplate;
 import com.music.lover.hometask.integration.response.AlbumInformation;
 import com.music.lover.hometask.integration.response.AlbumInformationResponse;
 import com.music.lover.hometask.repository.AlbumRepository;
 import com.music.lover.hometask.repository.ArtistRepository;
-import com.music.lover.hometask.service.UserService;
+import com.music.lover.hometask.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -58,11 +59,14 @@ class AlbumControllerIntegrationTest extends BaseControllerTest {
     private ItunesRestTemplate itunesRestTemplate;
 
     @MockBean
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Test
     void testGetAlbums() throws Exception {
         AlbumInformationResponse albumInformationResponse = AlbumMock.getAlbumInformationResponse();
+
+        when(userRepository.findByUuid(any()))
+                .thenAnswer(invocation -> Optional.of(new User()));
 
         when(albumRepository.findAllByArtistAmgArtistId(any()))
                 .thenAnswer(invocation -> new ArrayList<>());
@@ -91,6 +95,9 @@ class AlbumControllerIntegrationTest extends BaseControllerTest {
                 .andDo(documentGetAlbums())
                 .andDo(print())
                 .andReturn();
+
+        verify(userRepository, times(1))
+                .findByUuid(any());
 
         verify(albumRepository, times(1))
                 .findAllByArtistAmgArtistId(any());
